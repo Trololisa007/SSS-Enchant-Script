@@ -7,12 +7,12 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
     ExitApp()
 }
 
-; !s::
-; {
-;     MouseGetPos(&x, &y)
-;     MouseClick("WheelDown", x, y)
-;     MsgBox()
-; }
+!s::
+{
+    MouseGetPos(&x, &y)
+    MouseClick("WheelDown", x, y)
+    MsgBox()
+}
 
 !r::
 {
@@ -43,23 +43,23 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
     window.interactpos := window.AddText("xs yp+18 w80", "945, 764")
     window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.interactpos))
 
-    ; ; mass enchant location
-    ; window.AddText("xs", "Square Location")
-    ; window.InvBox := window.AddText("xs yp+18 w80", "855, 710")
-    ; window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvBox))
+    ; mass enchant location
+    window.AddText("xs", "Square Location")
+    window.InvBox := window.AddText("xs yp+18 w80", "855, 710")
+    window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvBox))
 
-    ; ; inv button location
-    ; window.AddText("xs", "Inv Button Location")
-    ; window.InvLoc := window.AddText("xs yp+18 w80", "957, 395")
-    ; window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvLoc))
+    ; inv button location
+    window.AddText("xs", "Inv Button Location")
+    window.InvLoc := window.AddText("xs yp+18 w80", "957, 395")
+    window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvLoc))
      
-    ; ; debug
-    ; window.AddText("xs", "debug")
-    ; window.debug := window.AddText("xs yp+18 w80", "957, 395")
-    ; window.AddButton("x+20 w40 yp-17", "debug").OnEvent("Click", debug.Bind(window.debug))
+    ; debug
+    window.AddText("xs", "debug")
+    window.debug := window.AddText("xs yp+18 w80", "957, 395")
+    window.AddButton("x+20 w40 yp-17", "debug").OnEvent("Click", debug.Bind(window.debug))
 
     window.AddButton("xm w120", "Start").OnEvent("Click", start,)
-    ; window.AddButton("xm w120", "Mass").OnEvent("Click", InventoryManager,)
+    window.AddButton("xm w120", "Mass").OnEvent("Click", InventoryManager,)
     window.Show("x1500")
 
     pausekey := "F7"
