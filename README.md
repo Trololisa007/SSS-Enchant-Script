@@ -12,7 +12,7 @@ To use this script, simply run the release version executable.  Alternatively, y
 - Select the enchantment rarities that you would like to keep from the checkboxes.
 - Change the value and button locations by clicking on their respective Pick Location buttons and then clicking on the screen where those locations would be.  The Value location should be set to where the rarity text appears on the weapon in the enchantment UI.  The button Location should set to where the ROLL ENCHANT button is located.
 
-![value location](https://imgur.com/a/EkkdGru.jpg)
+![](https://imgur.com/a/bs7Jgdf.PNG)
 
 
 - To run the program, press the Start button and wait for it to complete.  Note that you must have an item selected for it to work.  
