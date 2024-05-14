@@ -1,4 +1,5 @@
 ﻿#Requires AutoHotkey v2.0
+SendMode("Input")
 
 RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x828ea0"]
 
@@ -9,9 +10,11 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
 
 !s::
 {
+    CoordMode("Mouse", "Screen")
+    CoordMode("Pixel", "Screen")
     MouseGetPos(&x, &y)
-    MouseClick("WheelDown", x, y)
-    MsgBox()
+    ; MouseClick("WheelDown", x, y)
+    MsgBox(x " " y)
 }
 
 !r::
@@ -31,7 +34,6 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
     window.leg.OnEvent("Click", Update)
     window.myt.OnEvent("Click", Update)
 
-    
 
     ; value location
     window.AddText(, "Value Location")
@@ -45,14 +47,19 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
 
     ; mass enchant location
     window.AddText("xs", "Square Location")
-    window.InvBox := window.AddText("xs yp+18 w80", "855, 710")
+    window.InvBox := window.AddText("xs yp+18 w80", "560, 422")
     window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvBox))
 
     ; inv button location
     window.AddText("xs", "Inv Button Location")
     window.InvLoc := window.AddText("xs yp+18 w80", "957, 395")
     window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.InvLoc))
-     
+
+    ; equip button location
+    window.AddText("xs", "Equipment Button Location")
+    window.Equip := window.AddText("xs yp+18 w80", "1843, 307")
+    window.AddButton("x+20 w40 yp-17", "Pick Location").OnEvent("Click", getmouse.Bind(window.Equip))
+
     ; debug
     window.AddText("xs", "debug")
     window.debug := window.AddText("xs yp+18 w80", "957, 395")
@@ -67,9 +74,9 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
     Update()
     return
 
-    debug(*){
+    debug(*) {
         Sleep(1500)
-        MsgBox(getInvScaling(&upper, &lower))
+        MsgBox(getInvScaling(&upper, &lower, "0x00ff00"))
     }
 
     InitArray(n, Char := 0) {
@@ -108,11 +115,8 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
         ;get global coordinates of roblox app
         WinGetPos(&Robx, &Roby, &Robw, &Robh, "Roblox")
 
-        ; initialize breker for loop
-        breaker := 1
 
-
-        while (breaker) {
+        while (true) {
             Click(button[1] + Robx " " button[2] + Roby)
             Click()
             Sleep(3500)
@@ -121,7 +125,6 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
                 Py := 0
                 result := PixelSearch(&Px, &Py, value[1] - 50 + Robx, value[2] - 50 + Roby, value[1] + 50 + Robx, value[2] + 50 + Roby, RarityIndex[A_Index], 20)
                 if (result AND UpdateList[A_Index]) {
-                    MsgBox("found")
                     break 2
                 }
             }
@@ -134,12 +137,14 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
 
     ; enchants entire inventory
     InventoryManager(*) {
+        Sleep(500)
         CoordMode("Mouse", "Screen")
         CoordMode("Pixel", "Screen")
         ; CHANGE LATER
 
         InvBox := StrSplit(window.InvBox.value, ", ")
         InvLoc := StrSplit(window.InvLoc.value, ", ")
+        EquipLoc := StrSplit(window.Equip.value, ", ")
         override := 12
         endScroll := 1
         overscroll := 0
@@ -149,30 +154,32 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
         InvBox[1] := InvBox[1] + Robx
         InvBox[2] := InvBox[2] + Roby
 
-        MouseClick("Left", InvLoc[1] + Robx, InvLoc[2] + Roby)
-        MouseClick("Left", InvLoc[1] + Robx, InvLoc[2] + Roby)
-        Sleep(100)
+        SetDefaultMouseSpeed(50)
+        MouseClick("Left", EquipLoc[1] + Robx, EquipLoc[2] + Roby, 2)
+        Sleep(1000)
 
-        MouseClick("WheelUp", InvBox[1], InvBox[2])
-        boxDimention := getInvScaling(&upper, &lower)
+        MouseMove(InvBox[1], InvBox[2], "50")
+        boxDimention := getInvScaling(&upper, &lower, "0x00ff00")
+        ; MsgBox("got scale")
+        BoxScaleY := boxDimention * 0.965517
 
-        ; add initial 9 items to list
-        MondoList.Push([InvBox[1], InvBox[2] - 2 * boxDimention, 0])
-        MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2] - 1 * boxDimention, 0])
-        MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2] - 1 * boxDimention, 0])
-        MondoList.Push([InvBox[1] - 1 * boxDimention, InvBox[2] - 1 * boxDimention, 0])
-        MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2], 0])
-        MondoList.Push([InvBox[1] - 1 * boxDimention, InvBox[2], 0])
-        MondoList.Push([InvBox[1], InvBox[2], 0])
+        ; add initial 7 items to list
+        MondoList.Push([InvBox[1] + 2 * boxDimention, InvBox[2], 0])
+        MondoList.Push([InvBox[1], InvBox[2] + BoxScaleY, 0])
+        MondoList.Push([InvBox[1] + boxDimention, InvBox[2] + BoxScaleY, 0])
+        MondoList.Push([InvBox[1] + 2 * boxDimention, InvBox[2] + BoxScaleY, 0])
+        MondoList.Push([InvBox[1], InvBox[2] + 2 * BoxScaleY, 0])
+        MondoList.Push([InvBox[1] + boxDimention, InvBox[2] + 2 * BoxScaleY, 0])
+        MondoList.Push([InvBox[1] + 2 * boxDimention, InvBox[2] + 2 * BoxScaleY, 0])
 
         ; MsgBox(MondoList.Length)
 
-        MouseClick("WheelDown", InvBox[1], InvBox[2])
-        Sleep(500)
-        getInvScaling(&upper2, &lower2)
-        MouseClick("WheelUp", InvBox[1], InvBox[2])
+        ; MouseClick("WheelDown", InvBox[1], InvBox[2])
+        ; Sleep(500)
+        ; getInvScaling(&upper2, &lower2)
+        ; MouseClick("WheelUp", InvBox[1], InvBox[2])
 
-        MouseClick("Left", InvBox[1], InvBox[2])
+        ; MouseClick("Left", InvBox[1], InvBox[2])
 
 
         ; if after scrolling one tick the second upper value is less
@@ -216,29 +223,51 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
         ;     repeatColor := getMousePixelColor()
         ; }
         ; if (tollerance("0x1a1715", PixelGetColor(InvBox[1] - 2 * boxDimention, InvBox[2], NumLines), 5)) {
-        ;     MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2], NumLines])
-        ; }
+        ;     MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2], NumLines])s
+        ; }w
         ; if (tollerance("0x1a1715", PixelGetColor(InvBox[1] - 1 * boxDimention, InvBox[2], NumLines), 5)) {
         ;     MondoList.Push([InvBox[1] - 2 * boxDimention, InvBox[2], NumLines])
         ; }
         ; if (tollerance("0x1a1715", PixelGetColor(InvBox[1], InvBox[2], NumLines), 5)) {
         ;     MondoList.Push([InvBox[1], InvBox[2], NumLines])
-        ; }
+        ; }w
 
         ; MouseClick("Left", InvBox[1] - 2 * boxDimention, InvBox[2])
         ; Sleep(100)
-        inv2 := StrSplit(window.InvBox.value, ", ")
 
+        inv2 := StrSplit(window.InvBox.value, ", ")
+        ; MsgBox('exit window')
+        MouseMove(EquipLoc[1] + Robx, EquipLoc[2] + Roby, 100)
+        Sleep(200)
+        MouseClick("Left", EquipLoc[1] + Robx, EquipLoc[2] + Roby, 1)
+        Sleep(500)
+        Send("{S Down}")
+        Sleep(150)
+        Send("{S Up}")
+        Send("{W Down}")
+        Sleep(150)
+        Send("{W Up}")
+        MsgBox("wait")
+        Sleep(2000)
+        MouseMove(InvLoc[1] + Robx, InvLoc[2] + Roby, 100)
+            MouseClick("Left", InvLoc[1] + Robx, InvLoc[2] + Roby)
+
+        
         ; MsgBox("now going throug list")
         for lst in MondoList {
             ; MouseClick("Left", InvLoc[1] + Robx, InvLoc[2] + Roby)
+            MouseMove(InvLoc[1] + Robx, InvLoc[2] + Roby, 100)
             MouseClick("Left", InvLoc[1] + Robx, InvLoc[2] + Roby)
+            Sleep(300)
             loop lst[3] {
                 MouseClick("WheelDown", inv2[1] + Robx, inv2[2] + Roby)
                 Sleep(300)
             }
+            MouseMove(lst[1], lst[2], 50)
+            Sleep(500)
             MouseClick("Left", lst[1], lst[2])
             start()
+            Sleep(300)
         }
 
 
@@ -251,20 +280,19 @@ RarityIndex := ["0xd00e1e", "0xa18714", "0x755bf6", "0x1034e1", "0x1caa16", "0x8
     }
 
     ; gets upper and lower margin distances from the cursor location, returns height of box in pixels
-    getInvScaling(&upper, &lower) {
+    getInvScaling(&upper, &lower, hexval := "0x1a1715") {
         CoordMode("Mouse", "Screen")
         CoordMode("Pixel", "Screen")
         ;send 1 pixel probe out from box up and down to find box pixel size
         ;return the results
         MouseGetPos(&x, &y)
         offset := 1
-        hexval := "0xffffff"
-        while (tollerance(PixelGetColor(x, y - offset,), "0x1a1715", 5)) {
+        while (tollerance(PixelGetColor(x - offset, y - 20,), hexval, 20)) {
             offset++
         }
         upper := y - offset
         offset := 0
-        while (tollerance(PixelGetColor(x, y + offset,), "0x1a1715", 5)) {
+        while (tollerance(PixelGetColor(x + offset, y - 20,), hexval, 20)) {
             offset++
         }
         lower := y + offset
